@@ -1,0 +1,30 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: airflow-create-user
+  namespace: varun-dev
+spec:
+  template:
+    spec:
+      containers:
+        - name: create-user
+          image: apache/airflow:2.7.3
+          command: ["airflow", "users", "create"]
+          args:
+            - "--username"
+            - "admin"
+            - "--firstname"
+            - "Admin"
+            - "--lastname"
+            - "User"
+            - "--role"
+            - "Admin"
+            - "--email"
+            - "admin@example.com"
+            - "--password"
+            - "admin123"
+          envFrom:
+            - configMapRef:
+                name: airflow-config
+      restartPolicy: Never
+  backoffLimit: 4

@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spinnaker-deck
+  namespace: spinnaker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spinnaker-deck
+  template:
+    metadata:
+      labels:
+        app: spinnaker-deck
+    spec:
+      containers:
+        - name: spinnaker-deck
+          image: us-docker.pkg.dev/spinnaker-community/docker/deck:latest
+          ports:
+            - containerPort: 9000
+          env:
+            - name: API_HOST
+              value: "0.0.0.0"
+            - name: API_PORT
+              value: "8084"
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spinnaker-deck
+  namespace: spinnaker
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 9000
+      targetPort: 9000
+  selector:
+    app: spinnaker-deck

@@ -1,0 +1,44 @@
+{
+  "application": "airflow-varun-dev",
+  "name": "Deploy Airflow from Jenkins",
+  "stages": [
+    {
+      "name": "Deploy Airflow",
+      "type": "deploy",
+      "refId": "1",
+      "requisiteStageRefIds": [],
+      "clusters": [
+        {
+          "account": "azure-aks",
+          "application": "airflow-varun-dev",
+          "cloudProvider": "kubernetes",
+          "namespace": "varun-dev",
+          "containers": [
+            {
+              "image": "airflow-spinnaker:${parameters.BUILD_NUMBER}",
+              "name": "webserver"
+            }
+          ],
+          "strategy": "rollingUpdate",
+          "maxSurge": 1,
+          "maxUnavailable": 0
+        }
+      ]
+    }
+  ],
+  "triggers": [
+    {
+      "type": "jenkins",
+      "master": "jenkins",
+      "job": "airflow-spinnaker",
+      "propertyFile": "build.properties"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "BUILD_NUMBER",
+      "default": "latest",
+      "description": "Jenkins build number to deploy"
+    }
+  ]
+}

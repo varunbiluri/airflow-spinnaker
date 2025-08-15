@@ -16,7 +16,7 @@ spec:
       containers:
         - name: scheduler
           image: apache/airflow:2.7.3
-          command: ["scheduler"]
+          command: ["airflow", "scheduler"]
           envFrom:
             - configMapRef:
                 name: airflow-config

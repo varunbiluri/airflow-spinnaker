@@ -1,0 +1,17 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: airflow-init
+  namespace: varun-dev
+spec:
+  template:
+    spec:
+      containers:
+        - name: init
+          image: apache/airflow:2.7.3
+          command: ["airflow", "db", "init"]
+          envFrom:
+            - configMapRef:
+                name: airflow-config
+      restartPolicy: Never
+  backoffLimit: 4

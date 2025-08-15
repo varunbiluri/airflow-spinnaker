@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spinnaker-gate
+  namespace: spinnaker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spinnaker-gate
+  template:
+    metadata:
+      labels:
+        app: spinnaker-gate
+    spec:
+      containers:
+        - name: gate
+          image: openjdk:11-jre-slim
+          command: ["sh", "-c"]
+          args:
+            - |
+              echo "Spinnaker Gate Service"
+              echo "This is a placeholder for the full Spinnaker deployment"
+              echo "In production, you would use the official Spinnaker images"
+              sleep infinity
+          ports:
+            - containerPort: 8084
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spinnaker-deck
+  namespace: spinnaker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spinnaker-deck
+  template:
+    metadata:
+      labels:
+        app: spinnaker-deck
+    spec:
+      containers:
+        - name: deck
+          image: nginx:alpine
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: spinnaker-nginx-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: spinnaker-nginx-config
+  namespace: spinnaker
+data:
+  default.conf: |
+    server {
+        listen 80;
+        location / {
+            root /usr/share/nginx/html;
+            index index.html;
+            try_files $uri $uri/ /index.html;
+        }
+    }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spinnaker-gate
+  namespace: spinnaker
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8084
+      targetPort: 8084
+  selector:
+    app: spinnaker-gate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spinnaker-deck
+  namespace: spinnaker
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    app: spinnaker-deck

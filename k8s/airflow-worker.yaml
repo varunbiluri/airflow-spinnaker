@@ -16,7 +16,7 @@ spec:
       containers:
         - name: worker
           image: apache/airflow:2.7.3
-          command: ["celery"]
+          command: ["airflow", "celery"]
           args: ["worker"]
           envFrom:
             - configMapRef:

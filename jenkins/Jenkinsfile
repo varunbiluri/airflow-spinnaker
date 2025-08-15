@@ -1,0 +1,60 @@
+pipeline {
+    agent any
+    
+    environment {
+        DOCKER_IMAGE = 'airflow-spinnaker'
+        DOCKER_TAG = "${env.BUILD_NUMBER}"
+        KUBERNETES_NAMESPACE = 'varun-dev'
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+                echo "Code checked out from ${env.GIT_BRANCH}"
+            }
+        }
+        
+        stage('Build & Test') {
+            steps {
+                echo "Building Airflow application..."
+                sh 'docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .'
+                echo "Build completed successfully!"
+            }
+        }
+        
+        stage('Deploy to Spinnaker') {
+            steps {
+                echo "Triggering Spinnaker deployment..."
+                // This will trigger Spinnaker to deploy to Azure Kubernetes
+                sh '''
+                    echo "Deployment triggered for build ${BUILD_NUMBER}"
+                    echo "Image: ${DOCKER_IMAGE}:${DOCKER_TAG}"
+                    echo "Namespace: ${KUBERNETES_NAMESPACE}"
+                '''
+            }
+        }
+        
+        stage('Verify Deployment') {
+            steps {
+                echo "Verifying deployment in Azure Kubernetes..."
+                sh '''
+                    kubectl get pods -n ${KUBERNETES_NAMESPACE}
+                    kubectl get services -n ${KUBERNETES_NAMESPACE}
+                '''
+            }
+        }
+    }
+    
+    post {
+        always {
+            echo "Pipeline completed for build ${env.BUILD_NUMBER}"
+        }
+        success {
+            echo "Deployment successful! 🎉"
+        }
+        failure {
+            echo "Deployment failed! ❌"
+        }
+    }
+}

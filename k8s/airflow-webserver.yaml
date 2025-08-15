@@ -29,7 +29,7 @@ spec:
       containers:
         - name: webserver
           image: apache/airflow:2.7.3
-          command: ["webserver"]
+          command: ["airflow", "webserver"]
           ports:
             - containerPort: 8080
           envFrom:
