@@ -1,0 +1,37 @@
+{
+  "application": "airflow-varun-dev",
+  "name": "Deploy Airflow to varun-dev",
+  "stages": [
+    {
+      "name": "Deploy Airflow",
+      "type": "deploy",
+      "refId": "1",
+      "requisiteStageRefIds": [],
+      "clusters": [
+        {
+          "account": "azure-aks",
+          "application": "airflow-varun-dev",
+          "cloudProvider": "kubernetes",
+          "namespace": "varun-dev",
+          "containers": [
+            {
+              "image": "apache/airflow:2.7.3",
+              "name": "webserver"
+            }
+          ],
+          "strategy": "rollingUpdate",
+          "maxSurge": 1,
+          "maxUnavailable": 0
+        }
+      ]
+    }
+  ],
+  "triggers": [
+    {
+      "type": "git",
+      "source": "github",
+      "project": "your-username/airflow-spinnaker",
+      "branch": "main"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: airflow-config
+  namespace: varun-dev
+data:
+  AIRFLOW__CORE__EXECUTOR: "KubernetesExecutor"
+  AIRFLOW__CORE__SQL_ALCHEMY_CONN: "postgresql+psycopg2://airflow:airflow@airflow-postgresql:5432/airflow"
+  AIRFLOW__CORE__FERNET_KEY: "your-fernet-key-here"
+  AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+  AIRFLOW__WEBSERVER__SECRET_KEY: "your-secret-key-here"
+  AIRFLOW__KUBERNETES__WORKER_CONTAINER_REPOSITORY: "apache/airflow"
+  AIRFLOW__KUBERNETES__WORKER_CONTAINER_TAG: "2.7.3"
+  AIRFLOW__KUBERNETES__DELETE_WORKER_PODS: "True"
+  AIRFLOW__KUBERNETES__WORKER_PODS_CREATION_BATCH_SIZE: "1"
